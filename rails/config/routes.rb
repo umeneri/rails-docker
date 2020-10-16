@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  get 'registeration/register'
+  post 'registration/register'
   get 'login/login'
   resources :users
   resources :memos
