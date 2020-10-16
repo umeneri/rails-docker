@@ -1,15 +1,15 @@
 class MemosController < ApplicationController
   include ActionController::HttpAuthentication::Token::ControllerMethods
 
-  before_action :set_memo, only: [:show, :update, :destroy]
+  before_action :set_memo, only: %i[show update destroy]
 
   before_action :authenticate
 
   def authenticate
-        authenticate_or_request_with_http_token do |token,options|
-          auth_user = User.find_by(token: token)
-          auth_user != nil ? true : false
-        end
+    authenticate_or_request_with_http_token do |token, _options|
+      auth_user = User.find_by(token: token)
+      !auth_user.nil?
+    end
   end
 
   # GET /memos
@@ -50,13 +50,14 @@ class MemosController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_memo
-      @memo = Memo.find(params[:id])
-    end
 
-    # Only allow a trusted parameter "white list" through.
-    def memo_params
-      params.require(:memo).permit(:title, :content)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_memo
+    @memo = Memo.find(params[:id])
+  end
+
+  # Only allow a trusted parameter "white list" through.
+  def memo_params
+    params.require(:memo).permit(:title, :content)
+  end
 end
