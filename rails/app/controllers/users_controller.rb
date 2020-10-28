@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  before_action :set_user, only: [:show, :update, :destroy]
+  before_action :set_user, only: %i[show update destroy upload image]
 
   # GET /users
   def index
@@ -33,12 +33,31 @@ class UsersController < ApplicationController
     end
   end
 
+  # PUT /users/1/upload
+  def upload
+    if @user.update(user_params)
+      render json: @user
+    else
+      render json: @user.errors.full_messages, status: :unprocessable_entity
+    end
+  end
+
+  def image
+    if @user&.avatar&.attached?
+      render json: { image: rails_blob_url(@user.avatar) }
+    else
+      head :not_found
+    end
+  end
+
+  # DELETE /users/1
   # DELETE /users/1
   def destroy
     @user.destroy
   end
 
   private
+
     # Use callbacks to share common setup or constraints between actions.
     def set_user
       @user = User.find(params[:id])
@@ -46,6 +65,6 @@ class UsersController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def user_params
-      params.require(:user).permit(:name, :pwd, :token)
+      params.require(:user).permit(:name, :pwd, :token, :avatar)
     end
 end
